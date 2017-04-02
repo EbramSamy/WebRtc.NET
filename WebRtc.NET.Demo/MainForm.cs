@@ -213,7 +213,7 @@ namespace WebRtc.NET.Demo
         public const int captureFps = 5;
         public const bool barCodeScreen = false;
         // true for capturing Windows false for capturing screen
-        public const bool windowsCaptureEnable = false;
+        public const bool windowsCaptureEnable = true;
 
         readonly byte[] imgBuf = new byte[screenWidth * 3 * screenHeight];
         IntPtr imgBufPtr = IntPtr.Zero;

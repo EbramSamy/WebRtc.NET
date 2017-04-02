@@ -207,6 +207,14 @@ namespace WebRtc.NET.Demo
                                             var ok = session.WebRtc.InitializePeerConnection();
                                             if (ok)
                                             {
+                                                if (Form.checkBoxInternalScreen.Checked)
+                                                {
+                                                    if (!string.IsNullOrEmpty(Form.videoDevice))
+                                                    {
+                                                        var vok = session.WebRtc.SelectWindow(Form.videoDevice);
+                                                        Trace.WriteLine($"SelectWindow: {vok}, {Form.videoDevice}");
+                                                    }
+                                                }
                                                 go.Set();
 
                                                 // javascript side makes the offer in this demo

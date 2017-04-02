@@ -67,6 +67,7 @@ namespace Native
 		}
 
 #if DESKTOP_CAPTURE
+		static std::vector<std::string> GetOpenedWindows();
 		void DesktopCapturerSize(int & w, int & h)
 		{
 			if (capturer && capturer->desktop_frame)
@@ -92,6 +93,15 @@ namespace Native
 			{
 				capturer->CaptureFrame();
 			}
+		}
+
+		bool Conductor::SelectWindow(std::string & name)
+		{
+			if (capturer)
+			{
+				return capturer->SelectWindow(name);
+			}
+			return false;
 		}
 #endif
 		void CreateDataChannel(const std::string & label);
@@ -224,6 +234,7 @@ namespace Native
 		int caputureFps;
 		bool audioEnabled;
 		bool barcodeEnabled;
+		static bool captureWindows;
 
 		int width_;
 		int height_;

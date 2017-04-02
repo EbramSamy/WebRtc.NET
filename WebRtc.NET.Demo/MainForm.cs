@@ -212,6 +212,8 @@ namespace WebRtc.NET.Demo
         public const int screenHeight = 360;
         public const int captureFps = 5;
         public const bool barCodeScreen = false;
+        // true for capturing Windows false for capturing screen
+        public const bool windowsCaptureEnable = false;
 
         readonly byte[] imgBuf = new byte[screenWidth * 3 * screenHeight];
         IntPtr imgBufPtr = IntPtr.Zero;
@@ -275,7 +277,9 @@ namespace WebRtc.NET.Demo
                                             captureWidth = x;
                                             captureHeight = y;
                                         }         
-                                        g.DrawImage(captureImg, 0, 0, new Rectangle(Cursor.Position, new Size(screenWidth, screenHeight)), GraphicsUnit.Pixel);
+                                        //g.DrawImage(captureImg, 0, 0, new Rectangle(Cursor.Position, new Size(screenWidth, screenHeight)), GraphicsUnit.Pixel);
+                                        //g.DrawImage(captureImg, (screenWidth / 2) - (captureWidth / 2), (screenHeight / 2) - (captureHeight / 2), new Rectangle(new Point(0, 0), new Size(captureWidth, captureHeight)), GraphicsUnit.Pixel);
+                                        g.DrawImage(captureImg, 0, 0, screenWidth, screenHeight);
 
                                         // if no editing is needed
                                         //var yuv = s.Value.WebRtc.VideoCapturerI420Buffer();
@@ -379,6 +383,19 @@ namespace WebRtc.NET.Demo
         private void comboBoxVideo_SelectedIndexChanged(object sender, EventArgs e)
         {
             videoDevice = comboBoxVideo.SelectedItem as string;
+        }
+
+        private void checkBoxInternalScreen_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBoxInternalScreen.Checked)
+            {
+                ManagedConductor.SetCaptureWindows(windowsCaptureEnable);
+                comboBoxVideo.DataSource = ManagedConductor.GetOpenedWindows();
+            }
+            else
+            {
+                comboBoxVideo.DataSource = ManagedConductor.GetVideoDevices();
+            }
         }
     }
 }

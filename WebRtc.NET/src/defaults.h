@@ -39,6 +39,8 @@ namespace Native
 		virtual void OnCaptureResult(webrtc::DesktopCapturer::Result result, std::unique_ptr<webrtc::DesktopFrame> frame);
 		std::unique_ptr<webrtc::DesktopFrame> desktop_frame;
 		webrtc::DesktopCapturer::SourceList desktop_screens;
+		webrtc::DesktopCapturer::SourceList desktop_windows;
+		bool YuvFramesCapturer2::SelectWindow(std::string & name);
 #endif
 		rtc::scoped_refptr<webrtc::I420Buffer> video_buffer;
 		uint32_t frame_data_size_;

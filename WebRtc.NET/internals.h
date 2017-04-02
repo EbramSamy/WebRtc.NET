@@ -5,7 +5,7 @@
 #define WEBRTC_NET_INTERNALS_H_
 
 // enable webrtc::DesktopCapturer
-#define DESKTOP_CAPTURE 0
+#define DESKTOP_CAPTURE 1
 
 namespace Internal
 {

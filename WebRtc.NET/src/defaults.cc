@@ -66,24 +66,78 @@ namespace Native
 
 #if DESKTOP_CAPTURE
 		{
-			webrtc::DesktopCaptureOptions co;
-			co.set_allow_directx_capturer(true);
-			desktop_capturer = webrtc::DesktopCapturer::CreateScreenCapturer(co);
-			//desktop_capturer = webrtc::DesktopCapturer::CreateWindowCapturer(co);
-
-			desktop_capturer->GetSourceList(&desktop_screens);
-			for each(auto & s in desktop_screens)
+			if (Native::Conductor::captureWindows)
 			{
-				LOG(INFO) << "screen: " << s.id << " -> " << s.title;
+				webrtc::DesktopCaptureOptions co = webrtc::DesktopCaptureOptions::CreateDefault();
+				desktop_capturer = webrtc::DesktopCapturer::CreateWindowCapturer(co);
+				desktop_capturer->Start(this);
+
 			}
-			desktop_capturer->SelectSource(desktop_screens[0].id);
-			desktop_capturer->Start(this);
+			else
+			{
+				webrtc::DesktopCaptureOptions co = webrtc::DesktopCaptureOptions::CreateDefault();;
+				//co.set_allow_directx_capturer(true);
+				desktop_capturer = webrtc::DesktopCapturer::CreateScreenCapturer(co);
+
+
+				desktop_capturer->Start(this);
+			}
+
 		}
 #endif
 
 		LOG(LS_INFO) << "Yuv Frame Generator started";
 		return cricket::CS_RUNNING;
 	}
+
+#if DESKTOP_CAPTURE
+	bool YuvFramesCapturer2::SelectWindow(std::string & name)
+	{
+		if (desktop_capturer) {
+			if (Native::Conductor::captureWindows)
+			{
+				int selectedIndex = 0;
+				desktop_capturer->GetSourceList(&desktop_windows);
+				for each(auto & s in desktop_windows)
+				{
+					if (name == s.title)
+					{
+						LOG(INFO) << "screen: " << s.id << " -> " << s.title;
+						selectedIndex = s.id;
+						desktop_capturer->SelectSource(selectedIndex);
+						return true;
+					}
+
+				}
+			}
+			else
+			{
+				int selectedIndex = 0;
+				int i = -1;
+				desktop_capturer->GetSourceList(&desktop_screens);
+				for each(auto & s in desktop_screens)
+				{
+					LOG(INFO) << "screen: " << s.id << " -> " << s.title;
+					i++;
+				}
+				try
+				{
+					selectedIndex = std::stoi(name);
+				}
+				catch (const std::exception&)
+				{
+
+				}
+				if (selectedIndex > i)
+					selectedIndex = 0;
+				desktop_capturer->SelectSource(desktop_screens[selectedIndex].id);
+				return true;
+			}
+
+		}
+		return false;
+	}
+#endif
 
 	bool YuvFramesCapturer2::IsRunning()
 	{

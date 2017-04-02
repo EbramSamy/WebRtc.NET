@@ -305,6 +305,15 @@ namespace WebRtc
 				cd->audioEnabled = enable;
 			}
 
+			static void SetCaptureWindows(bool captureWindows)
+			{
+#if DESKTOP_CAPTURE
+				Native::Conductor::captureWindows = captureWindows;
+#else
+				Native::Conductor::captureWindows = false;
+#endif
+			}
+
 			void SetVideoCapturer(int width, int height, int caputureFps, bool barcodeEnabled)
 			{
 				cd->width_ = width;
@@ -339,6 +348,34 @@ namespace WebRtc
 				cd->DesktopCapturerSize(wn, hn);
 				w = wn;
 				h = hn;
+#else
+				throw gcnew System::NotImplementedException("set internals.h #define DESKTOP_CAPTURE 1");
+#endif
+			}
+
+			static System::Collections::Generic::List<String^> ^ GetOpenedWindows()
+			{
+#if DESKTOP_CAPTURE
+				System::Collections::Generic::List<String^> ^ ret = nullptr;
+				std::vector<std::string> windows = Native::Conductor::GetOpenedWindows();
+				for (const auto & d : windows)
+				{
+					if (ret == nullptr)
+					{
+						ret = gcnew System::Collections::Generic::List<String^>();
+					}
+					ret->Add(marshal_as<String^>(d));
+				}
+				return ret;
+#else
+				throw gcnew System::NotImplementedException("set internals.h #define DESKTOP_CAPTURE 1");
+#endif
+			}
+
+			bool SelectWindow(String ^ name)
+			{
+#if DESKTOP_CAPTURE
+				return cd->SelectWindow(marshal_as<std::string>(name));
 #else
 				throw gcnew System::NotImplementedException("set internals.h #define DESKTOP_CAPTURE 1");
 #endif

@@ -8,6 +8,7 @@
 #include "webrtc/modules/video_coding/codecs/vp8/include/vp8.h"
 #include "webrtc/modules/video_capture/video_capture_factory.h"
 #include "webrtc/media/engine/webrtcvideocapturerfactory.h"
+#include "webrtc/modules/desktop_capture/desktop_capture_options.h"
 
 // for servers
 #include "webrtc/p2p/base/relayserver.h"
@@ -55,7 +56,7 @@ namespace Native
 	private:
 		rtc::OptionsFile file_;
 	};
-
+	bool Native::Conductor::captureWindows = false;
 	Conductor::Conductor()
 	{
 		onError = nullptr;
@@ -303,6 +304,44 @@ namespace Native
 		}
 		return false;
 	}
+
+#if DESKTOP_CAPTURE
+	std::vector<std::string> Conductor::GetOpenedWindows()
+	{
+		std::vector<std::string> windows;
+		std::unique_ptr<webrtc::DesktopCapturer> capturer_;
+		if (Native::Conductor::captureWindows)
+		{
+			capturer_ = webrtc::DesktopCapturer::CreateWindowCapturer(
+				webrtc::DesktopCaptureOptions::CreateDefault());
+			webrtc::DesktopCapturer::SourceList sources;
+			capturer_->GetSourceList(&sources);
+
+			// Verify that window titles are set.
+			for (auto it = sources.begin(); it != sources.end(); ++it) {
+				windows.push_back(it->title);
+			}
+		}
+		else
+		{
+			capturer_ = webrtc::DesktopCapturer::CreateScreenCapturer(
+				webrtc::DesktopCaptureOptions::CreateDefault());
+			webrtc::DesktopCapturer::SourceList sources;
+			capturer_->GetSourceList(&sources);
+
+			// Verify that window titles are set.
+			for (auto it = sources.begin(); it != sources.end(); ++it) {
+				windows.push_back(std::to_string(it->id));
+			}
+		}
+
+
+
+
+		return windows;
+	}
+
+#endif
 
 	void Conductor::AddStreams()
 	{
